@@ -31,10 +31,10 @@ void mainLogic(const struct Filedata data[], int records) {
             ViewbyYear(data,records);
             break;
         case 2:
-            //ViewbyProvince();
+            ViewbyProvince(data,records);
             break;
         case 3:
-            //ViewbyTaxon();
+            ViewbyTaxon(data,records);
             break;
         case 4:
             //Viewbypt();
@@ -49,8 +49,22 @@ void mainLogic(const struct Filedata data[], int records) {
 
 //Display FUNCTIONS
 void displayHeader(int type) {
-    printf("\nYEAR EXTINCT EXTIRPATED ENDANGERED THREATENED CONCERN     TOTAL\n");
-    printf("---- ------- ---------- ---------- ---------- ------- ---------\n");
+    
+    if (type==1)
+    {
+        printf("\nYEAR EXTINCT EXTIRPATED ENDANGERED THREATENED CONCERN     TOTAL\n");
+        printf("---- ------- ---------- ---------- ---------- ------- ---------\n");
+    }
+    if (type == 2)
+    {
+        printf("\nPROVINCE             EXTINCT EXTIRPATED ENDANGERED THREATENED CONCERN     TOTAL\n");
+        printf("-------------------- ------- ---------- ---------- ---------- ------- ---------\n");
+    }
+    if (type == 3)
+    {
+        printf("\nTAXON           EXTINCT EXTIRPATED ENDANGERED THREATENED CONCERN     TOTAL\n");
+        printf("--------------- ------- ---------- ---------- ---------- ------- ---------\n");
+    }
 }
 
 
@@ -62,11 +76,11 @@ void ViewbyYear(const struct FileData data[],int max) {
     int ex=0, et=0, en=0, th=0, con=0, sum = 0,se=0,sx=0,sn=0,st=0,sc=0;
     for (; year < 2020; year++)
     {
-        ex = countex(data, max, year);
-        et = countext(data, max, year);
-        en = counted(data, max, year);
-        th = countth(data, max, year);
-        con = countcon(data, max, year);
+        ex = countex(data, max, year,"","", 1);
+        et = countext(data, max, year, "", "", 1);
+        en = counted(data, max, year, "", "", 1);
+        th = countth(data, max, year, "", "", 1);
+        con = countcon(data, max, year, "", "", 1);
         total = ex + et + en + th + con;
         printf("%d    %d       %d       %d       %d    %d     %d\n",year,ex,et,en,th,con,total);
         sum = total + sum;
@@ -74,12 +88,56 @@ void ViewbyYear(const struct FileData data[],int max) {
         ex = 0, et = 0, en = 0, th = 0, con = 0,total;
     }
     printf("     ------- ---------- ---------- ---------- ------- ---------\n");
-    printf("       %d      %d      %d      %d   %d    %d\n", se, sx, sn, st, sc,sum);
+    printf("       %d      %d      %d      %d   %d    %d\n\n", se, sx, sn, st, sc,sum);
 }
 
-//ViewbyProvince();
+ViewbyProvince(const struct FileData data[], int max) {
+    displayHeader(2);
+    int total = 0;
+    int i=0;
+    char* province[13] = {"Ontario","Nunavut","Manitoba","Yukon Territory","New Brunswick","Quebec","Saskatchewan","Nova Scotia","Newfoundland","Alberta" ,"Prince Edward Island" ,"British Columbia" ,"Northwest Territory"};
+    char* p[13] = { "ON","NU","MB","YT","NB","QC","SK","NS","NL","AB" ,"PE" ,"BC" ,"NT" };
+    int ex = 0, et = 0, en = 0, th = 0, con = 0, sum = 0, se = 0, sx = 0, sn = 0, st = 0, sc = 0;
+    for (; i < 13; i++)
+    {
+        ex = countex(data, max, 0, p[i], "", 2);
+        et = countext(data, max, 0, p[i], "", 2);
+        en = counted(data, max, 0, p[i], "", 2);
+        th = countth(data, max, 0, p[i], "", 2);
+        con = countcon(data, max, 0, p[i], "", 2);
+        total = ex + et + en + th + con;
+        printf("%-22s  %d       %d       %d       %d    %d     %d\n", province[i], ex, et, en, th, con, total);
+        sum = total + sum;
+        se += ex, sx += et, sn += en, st += th, sc += con;
+        ex = 0, et = 0, en = 0, th = 0, con = 0, total;
+    }
+    printf("-------------------- ------- ---------- ---------- ---------- ------- ---------\n");
+    printf("                       %d      %d      %d      %d   %d    %d\n\n", se, sx, sn, st, sc, sum);
 
-//ViewbyTaxon();
+}
+
+ViewbyTaxon(const struct FileData data[], int max) {
+    displayHeader(3);
+    int total = 0;
+    int i = 0;
+    char* taxon[10] = {"Mammals","Birds","Reptiles","Amphibians","Fishes","Arthropods","Molluscs","Vascular Plants","Mosses","Lichens"};
+    int ex = 0, et = 0, en = 0, th = 0, con = 0, sum = 0, se = 0, sx = 0, sn = 0, st = 0, sc = 0;
+    for (; i < 10; i++)
+    {
+        ex = countex(data, max, 0, "", taxon[i], 3);
+        et = countext(data, max, 0, "", taxon[i], 3);
+        en = counted(data, max, 0, "", taxon[i], 3);
+        th = countth(data, max, 0, "", taxon[i], 3);
+        con = countcon(data, max, 0, "", taxon[i],3);
+        total = ex + et + en + th + con;
+        printf("%-17s  %d       %d       %d       %d    %d     %d\n", taxon[i], ex, et, en, th, con, total);
+        sum = total + sum;
+        se += ex, sx += et, sn += en, st += th, sc += con;
+        ex = 0, et = 0, en = 0, th = 0, con = 0, total;
+    }
+    printf("                ------- ---------- ---------- ---------- ------- ---------\n");
+    printf("                  %d      %d      %d      %d   %d    %d\n\n", se, sx, sn, st, sc, sum);
+}
 
 //Viewbypt();
 
@@ -89,57 +147,87 @@ int getyear(const struct FileData data[]) {
     return y;
 }
 
-int countex(const struct FileData data[], int max, int year) {
+int countex(const struct FileData data[], int max, int year,char provice[], char taxon[],int choice) {
     int i = 0;
     int total = 0;
     for (; i < max; i++)
     {
-        if (data[i].year == year && !strcmp(data[i].status, "EXTINCT")) {
+        if (data[i].year == year && !strcmp(data[i].status, "EXTINCT") && choice==1) {
             total+=data[i].count;
         }
-    }
-    return total;
-}
-int countext(const struct FileData data[], int max, int year) {
-    int i = 0;
-    int total = 0;
-    for (; i < max; i++)
-    {
-        if (data[i].year == year && !strcmp(data[i].status, "EXTIRPATED")) {
+        if (!strcmp(data[i].province, provice) && !strcmp(data[i].status, "EXTINCT") && choice == 2) {
+            total += data[i].count;
+        }
+        if (!strcmp(data[i].taxon, taxon) && !strcmp(data[i].status, "EXTINCT") && choice == 3) {
             total += data[i].count;
         }
     }
     return total;
 }
-int counted(const struct FileData data[], int max, int year) {
+int countext(const struct FileData data[], int max, int year, char provice[], char taxon[], int choice) {
     int i = 0;
     int total = 0;
     for (; i < max; i++)
     {
-        if (data[i].year == year && !strcmp(data[i].status, "ENDANGERED")) {
+        if (data[i].year == year && !strcmp(data[i].status, "EXTIRPATED") && choice == 1) {
+            total += data[i].count;
+        }
+        if (!strcmp(data[i].province, provice) && !strcmp(data[i].status, "EXTIRPATED") && choice == 2) {
+            total += data[i].count;
+        }
+        if (!strcmp(data[i].taxon, taxon) && !strcmp(data[i].status, "EXTIRPATED") && choice == 3) {
             total += data[i].count;
         }
     }
     return total;
 }
-int countth(const struct FileData data[], int max, int year) {
+int counted(const struct FileData data[], int max, int year, char provice[], char taxon[], int choice) {
+    int i = 0;
+    int total = 0;
+    for (; i < max; i++)
+    {
+        if (data[i].year == year && !strcmp(data[i].status, "ENDANGERED") && choice == 1) {
+            total += data[i].count;
+        }
+        if (!strcmp(data[i].province, provice) && !strcmp(data[i].status, "ENDANGERED") && choice == 2) {
+            total += data[i].count;
+        }
+        if (!strcmp(data[i].taxon, taxon) && !strcmp(data[i].status, "ENDANGERED") && choice == 3) {
+            total += data[i].count;
+        }
+    }
+    return total;
+}
+int countth(const struct FileData data[], int max, int year, char provice[], char taxon[], int choice) {
     int i = 0;
     int total = 0;
     for (; i < max; i++)
     {
 
-        if (data[i].year == year && !strcmp(data[i].status, "THREATENED")) {
+        if (data[i].year == year && !strcmp(data[i].status, "THREATENED") && choice == 1) {
+            total += data[i].count;
+        }
+        if (!strcmp(data[i].province, provice) && !strcmp(data[i].status, "THREATENED") && choice == 2) {
+            total += data[i].count;
+        }
+        if (!strcmp(data[i].taxon, taxon) && !strcmp(data[i].status, "THREATENED") && choice == 3) {
             total += data[i].count;
         }
     }
     return total;
 }
-int countcon(const struct FileData data[], int max, int year) {
+int countcon(const struct FileData data[], int max, int year, char provice[], char taxon[], int choice) {
     int i = 0;
     int total = 0;
     for (; i < max; i++)
     {
-        if (data[i].year == year && !strcmp(data[i].status, "SPECIAL CONCERN")) {
+        if (data[i].year == year && !strcmp(data[i].status, "SPECIAL CONCERN") && choice == 1) {
+            total += data[i].count;
+        }
+        if (!strcmp(data[i].province, provice) && !strcmp(data[i].status, "SPECIAL CONCERN") && choice == 2) {
+            total += data[i].count;
+        }
+        if (!strcmp(data[i].taxon, taxon) && !strcmp(data[i].status, "SPECIAL CONCERN") && choice == 3) {
             total += data[i].count;
         }
     }

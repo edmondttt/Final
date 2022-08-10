@@ -24,23 +24,23 @@ void displayHeader(int type);
 
 
 //Appilcation Funtions
-void ViewbyYear(const struct Filedata data[],int max);
+void ViewbyYear(const struct FileData data[],int max);
 
-//ViewbyProvince();
+ViewbyProvince(const struct FileData data[],int max);
 
-//ViewbyTaxon();
+ViewbyTaxon(const struct FileData data[],int max);
 
 //Viewbypt();
 
 //Utility function
-int getyear(const struct Filedata data[]);
+int getyear(const struct FileData data[]);
 
 int inputInt();
-int countex(const struct FileData data[], int max, int year);
-int counted(const struct FileData data[], int max, int year);
-int countext(const struct FileData data[], int max, int year);
-int countth(const struct FileData data[], int max, int year);
-int countcon(const struct FileData data[], int max, int year);
+int countex(const struct FileData data[], int max, int year, char provice[], char taxon[], int choice);
+int counted(const struct FileData data[], int max, int year, char provice[], char taxon[], int choice);
+int countext(const struct FileData data[], int max, int year, char provice[], char taxon[], int choice);
+int countth(const struct FileData data[], int max, int year, char provice[], char taxon[], int choice);
+int countcon(const struct FileData data[], int max, int year, char provice[], char taxon[], int choice);
 
 
 //////////////////////////////////////
